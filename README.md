@@ -2,6 +2,8 @@
 GNSS files reader that builds pandas dataframes.
 
 # Example usage:
+
+from pdrinex import pdrinex
 reader=pdrinex()
 
 obsRinex="test_data/RJNI00BRA_R_20210680000_01D_15S_MO.rnx"
