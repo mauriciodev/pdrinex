@@ -94,7 +94,47 @@ class pdrinex:
         obs=pd.DataFrame(data)
         return obs,header
 
+    """Creates a pandas dataframe with columns: satellite, epoch and navigation values."""
+    def readSP3(self,fileName):
+        eph={} #epoch, sat, obsvector
+        currentEpoch=None
+        
+        obsIds={} #this will represent the observables on each system. Ex.: 'C': ['C2I', 'C6I', 'C7I', 'L2I', 'L6I', 'L7I', 'S2I', 'S6I', 'S7I']
+        data = {
+            'satellite': [],
+            'epoch':[],
+            'X':[],
+            'Y':[],
+            'Z':[],
+            'dt_s':[]
+            }
+        with open(fileName) as f:
+            header=[]
+            headerEnded=False
+            for line in f:
+                if not headerEnded and line[0]=='*':
+                    headerEnded=True
+                if not headerEnded:
+                        header.append(line)
+                else:
+                    if line[0]=="*": #new epoch
+                        values = re.split(' +', line)                
+                        values[6]="{:.6f}". format(float(values[6])) #reducing second decimal places
+                        epoch=' '.join(values[1:7])
+                        currentEpoch=datetime.strptime(epoch, "%Y %m %d %H %M %S.%f")
+                    elif line[0]=='P':
+                        sat=line[1:5]
+                        data['satellite'].append(sat)
+                        values=re.split(' +', line[5:].strip())
+                        data['epoch'].append(currentEpoch)
+                        data['X'].append(float(values[0]))
+                        data['Y'].append(float(values[1]))
+                        data['Z'].append(float(values[2]))
+                        data['dt_s'].append(float(values[3]))
+                        
 
+        obs=pd.DataFrame(data)
+        return obs,header
 
 if __name__=="__main__":
     obsRinex="test_data/RJNI00BRA_R_20210680000_01D_15S_MO.rnx"
@@ -124,6 +164,12 @@ if __name__=="__main__":
     end=time.perf_counter()  
     print(f"Nav RINEX read in {end - start:0.4f} seconds")
     print(nav)
-    print("Done")
-
-
+    
+    start=time.perf_counter()
+    sp3File="test_data/COD0MGXFIN_20210680000_01D_05M_ORB.SP3"
+    satPos,header=reader.readSP3(sp3File) 
+    end=time.perf_counter()  
+    print(f"SP3 read in {end - start:0.4f} seconds")
+    print(satPos)
+    epoch=datetime.strptime("2021  3  9 12 30  0.000000", "%Y %m %d %H %M %S.%f")
+    print(satPos[satPos["epoch"]==epoch])
