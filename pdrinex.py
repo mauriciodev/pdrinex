@@ -97,7 +97,7 @@ class pdrinex:
 
 
 if __name__=="__main__":
-    obsRinex="RJNI00BRA_R_20210680000_01D_15S_MO.rnx"
+    obsRinex="test_data/RJNI00BRA_R_20210680000_01D_15S_MO.rnx"
 
 
     start=time.perf_counter()
@@ -119,7 +119,7 @@ if __name__=="__main__":
     print(f"epochs iterated {end - start:0.4f} seconds")
 
     start=time.perf_counter()
-    navRinex="BRDC00WRD_S_20210680000_01D_MN.rnx"
+    navRinex="test_data/BRDC00WRD_S_20210680000_01D_MN.rnx"
     nav,header=reader.readRinexNav(navRinex) 
     end=time.perf_counter()  
     print(f"Nav RINEX read in {end - start:0.4f} seconds")
