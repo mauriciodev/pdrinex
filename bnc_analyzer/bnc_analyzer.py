@@ -22,10 +22,6 @@ class BNCAnalyzer:
                 logging.info("Found less epochs than information. This is probably a major data issue in the input file.") 
                 data[key]=data[key][:len(data['epoch'])]
         return data
-    def fillColumn(self,data,n,column):
-        pass
-
-
 
     """Creates a pandas dataframe with columns: observable,observableid,satellite and epoch."""
     def readPPP(self,fileName,outFileName):
@@ -75,9 +71,6 @@ class BNCAnalyzer:
                     data['TRP'].append(float(values[2]))
                     data['devTRP'].append(float(values[5].strip()))
 
-
-                    
-                
         data=self.fillLists(data)
         df=pd.DataFrame(data)
         df.to_excel(outFileName)
@@ -88,10 +81,6 @@ class BNCAnalyzer:
         
 
 if __name__=="__main__":
-    """if len(sys.argv)==1:
-        pppFile="POAL21534.ppp"
-    else:
-        pppFile=sys.argv[1]"""
     for root, dirs, files in os.walk(".", topdown=False):
         for name in files:
             if name.endswith(".ppp"):
@@ -109,6 +98,4 @@ if __name__=="__main__":
                     logging.info("Problems processing ", pppFile)
                     logging.info(e)
                 
-
-    start=time.perf_counter()
     input("Finished. Press ENTER to exit.")
