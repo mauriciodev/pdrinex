@@ -15,7 +15,7 @@ class pdrinex:
     def readRinexObs(self,fileName):
         obs={} #epoch, sat, obsvector
         currentEpoch=None
-        
+        pos=None
         obsIds={} #this will represent the observables on each system. Ex.: 'C': ['C2I', 'C6I', 'C7I', 'L2I', 'L6I', 'L7I', 'S2I', 'S6I', 'S7I']
         data = {'observable':  [],
             'observableid': [],
@@ -30,12 +30,15 @@ class pdrinex:
                     if not "END OF HEADER" in line:
                         header.append(line)
                         if "SYS / # / OBS TYPES" in line:
-                            line, sep, tail = line.partition('SYS')
+                            line= line.partition('SYS')[0]
                             if not line[0]==' ': #if we have a system on first digit, it's the first line of measures.
                                 system=line[0]
                                 obsIds[system]=re.split(' +', line)[2:-1]
                             else:
                                 obsIds[system]+=re.split(' +', line)[1:-1]
+                        if "APPROX POSITION XYZ" in line:
+                            values=re.split(' +', line.strip())
+                            pos=[float(v) for v in values[0:3]]
                     else:
                         headerEnded=True
                 else:
@@ -46,7 +49,7 @@ class pdrinex:
                         currentEpoch=datetime.strptime(epoch, "%Y %m %d %H %M %S.%f")
                     else:
                         values=self.chunks(line[3:].strip(),16)
-                        sat=line[:3]
+                        sat=line[:3].strip()
 
                         for i,observable in enumerate(values):
                             if not observable=='' and i<len(obsIds[sat[0]]):
@@ -56,7 +59,7 @@ class pdrinex:
                                 data['observableid'].append(obsIds[sat[0]][i])
                                 data['epoch'].append(currentEpoch)
         obs=pd.DataFrame(data)
-        return obs,header
+        return obs,header,pos
 
     """Creates a pandas dataframe with columns: satellite, epoch and navigation values."""
     def readRinexNav(self,fileName):
@@ -123,18 +126,20 @@ class pdrinex:
                         epoch=' '.join(values[1:7])
                         currentEpoch=datetime.strptime(epoch, "%Y %m %d %H %M %S.%f")
                     elif line[0]=='P':
-                        sat=line[1:5]
+                        sat=line[1:5].strip()
                         data['satellite'].append(sat)
                         values=re.split(' +', line[5:].strip())
                         data['epoch'].append(currentEpoch)
-                        data['X'].append(float(values[0]))
-                        data['Y'].append(float(values[1]))
-                        data['Z'].append(float(values[2]))
-                        data['dt_s'].append(float(values[3]))
+                        data['X'].append(float(values[0])*1000)
+                        data['Y'].append(float(values[1])*1000)
+                        data['Z'].append(float(values[2])*1000)
+                        data['dt_s'].append(float(values[3])*0.000001)
                         
 
         obs=pd.DataFrame(data)
         return obs,header
+
+        
 
 if __name__=="__main__":
     obsRinex="test_data/RJNI00BRA_R_20210680000_01D_15S_MO.rnx"
@@ -142,7 +147,7 @@ if __name__=="__main__":
 
     start=time.perf_counter()
     reader=pdrinex()
-    obs,header=reader.readRinexObs(obsRinex) 
+    obs,header,pos=reader.readRinexObs(obsRinex) 
     end=time.perf_counter()    
     print(f"RINEX read in {end - start:0.4f} seconds")
 
