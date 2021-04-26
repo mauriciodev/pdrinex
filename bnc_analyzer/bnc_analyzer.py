@@ -1,7 +1,8 @@
 import pandas as pd
 import re,time,sys, os
 from datetime import datetime
-
+import logging
+logging.basicConfig(filename='bnc_analyzer.log',  level=logging.DEBUG)
 
 
 class BNCAnalyzer:
@@ -18,7 +19,7 @@ class BNCAnalyzer:
             if len(data['epoch'])>len(data[key]):
                 data[key].append('')
             if len(data['epoch'])<len(data[key]):
-                print("Found less epochs than information. This is probably a major data issue in the input file.")
+                logging.info("Found less epochs than information. This is probably a major data issue in the input file.") 
                 data[key]=data[key][:len(data['epoch'])]
         return data
     def fillColumn(self,data,n,column):
@@ -95,17 +96,18 @@ if __name__=="__main__":
         for name in files:
             if name.endswith(".ppp"):
                 pppFile=os.path.join(root, name)
-                print(pppFile)
+                logging.info("Processing "+pppFile)
+                print("Processing "+pppFile)
                 outFilePath=pppFile.replace(".ppp",".xlsx")
                 start=time.perf_counter()
                 try:
                     reader=BNCAnalyzer()
                     reader.readPPP(pppFile,outFilePath) 
                     end=time.perf_counter()    
-                    print(f"PPP converted in {end - start:0.4f} seconds")
+                    logging.info(f"PPP converted in {end - start:0.4f} seconds")
                 except Exception as e:
-                    print("Problems processing ", pppFile)
-                    print(e)
+                    logging.info("Problems processing ", pppFile)
+                    logging.info(e)
                 
 
     start=time.perf_counter()
