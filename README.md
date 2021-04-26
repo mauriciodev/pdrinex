@@ -12,3 +12,6 @@ obs,header=reader.readRinexObs(obsRinex)
 navRinex="test_data/BRDC00WRD_S_20210680000_01D_MN.rnx"
 nav,header=reader.readRinexNav(navRinex) 
 ```
+
+# BNC Analyzer
+Inside the bnc_analyzer folder there is a python script to convert .ppp files created with [BNC](https://igs.bkg.bund.de/ntrip/bnc) to xlsx files. 
