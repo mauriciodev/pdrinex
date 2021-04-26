@@ -7,4 +7,4 @@ Using a "prompt" terminal run the command:
 
 pip install pandas openpyxl xlwt
 
-Copy [bnc_analyzer.py](https://raw.githubusercontent.com/mauriciodev/pdrinex/main/bnc_analyzer/bnc_analyzer.py) to the root folder where the .ppp files are. The script creates a XLS file for each .ppp file found on the subfolders.
+Copy [bnc_analyzer.py](https://raw.githubusercontent.com/mauriciodev/pdrinex/main/bnc_analyzer/bnc_analyzer.py) (right click, save as...) to the root folder where the .ppp files are. The script creates a XLS file for each .ppp file found on the subfolders.
